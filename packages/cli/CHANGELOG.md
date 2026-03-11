@@ -1,5 +1,11 @@
 # work-journal
 
+## 2.0.1
+
+### Patch Changes
+
+- Restore README in published npm package
+
 ## 2.0.0
 
 ### Major Changes
