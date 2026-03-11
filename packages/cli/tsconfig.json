@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "strict": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "bundler",
     "target": "ES2022",
     "outDir": "dist",
     "declaration": true,
-    "module": "Node16",
+    "module": "ESNext",
     "esModuleInterop": true
   },
   "include": ["src"]

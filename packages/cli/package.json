@@ -2,13 +2,14 @@
   "name": "work-journal",
   "version": "1.4.0",
   "description": "Work Journal CLI",
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "work-journal": "dist/index.js"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs --dts",
-    "postbuild": "node copy-templates.js",
+    "build": "tsup src/index.ts --format esm --dts",
+    "postbuild": "node copy-templates.cjs",
     "prepare": "pnpm run build",
     "test": "vitest run",
     "prepack": "cp ../../README.md ./README.md"
@@ -16,7 +17,7 @@
   "files": [
     "dist",
     "templates",
-    "copy-templates.js"
+    "copy-templates.cjs"
   ],
   "keywords": [],
   "author": "",
