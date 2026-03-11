@@ -1,5 +1,11 @@
 # work-journal
 
+## 2.0.0
+
+### Major Changes
+
+- Switch to ESM build, drop Node 18 support, update all dependencies to fix security vulnerabilities
+
 ## 1.0.5
 
 ### Patch Changes
