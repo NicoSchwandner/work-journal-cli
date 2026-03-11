@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -23,12 +23,16 @@ jobs:
           version: 10.10.0
           run_install: false
 
-      - name: Set up Node 20 + pnpm cache
+      - name: Set up Node 22 + pnpm cache
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
           cache-dependency-path: "**/pnpm-lock.yaml"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Ensure npm >= 11.5 for trusted publishing
+        run: npm install -g npm@latest
 
       - run: pnpm install --frozen-lockfile
 
@@ -43,7 +47,6 @@ jobs:
           commit: "chore: update versions"
           title: "release"
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Show published packages
