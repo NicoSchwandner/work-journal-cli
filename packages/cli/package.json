@@ -1,6 +1,6 @@
 {
   "name": "work-journal",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Work Journal CLI",
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,8 @@
     "build": "tsup src/index.ts --format esm --dts",
     "postbuild": "node copy-templates.cjs",
     "prepare": "pnpm run build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "cp ../../README.md ./README.md"
   },
   "files": [
     "dist",
