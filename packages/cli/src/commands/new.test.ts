@@ -1,14 +1,14 @@
 import mockFs from "mock-fs";
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import { format, addDays, setDay } from "date-fns";
 import { runNew } from "./new";
+import { addDays, isoDate } from "../lib/dateLogic";
 import { describe, test, expect, afterEach } from "vitest";
 
-// Helper to get a date that's a specific day of the week
+// Date in the current Monday-start week with the given day (1 = Monday … 7 = Sunday)
 function getDateByDay(dayOfWeek: number): Date {
   const today = new Date();
-  return setDay(today, dayOfWeek, { weekStartsOn: 1 });
+  return addDays(today, dayOfWeek - (today.getDay() || 7));
 }
 
 // Helper to create fake templates
@@ -89,8 +89,7 @@ describe("new command", () => {
     const endOfQuarterFriday = new Date(2025, 2, 28); // March 28, 2025 (zero-indexed month)
 
     // Set up year/month directory structure
-    const year = format(endOfQuarterFriday, "yyyy");
-    const month = format(endOfQuarterFriday, "MM");
+    const [year, month] = isoDate(endOfQuarterFriday).split("-");
     mkdirSync(join(process.cwd(), "Journal", year, month), { recursive: true });
 
     // Run the new command
@@ -135,9 +134,8 @@ describe("new command", () => {
     const monday = getDateByDay(1);
 
     // Create a journal directory and existing file
-    const year = format(monday, "yyyy");
-    const month = format(monday, "MM");
-    const dateString = format(monday, "yyyy-MM-dd");
+    const dateString = isoDate(monday);
+    const [year, month] = dateString.split("-");
     const journalDir = join(process.cwd(), "Journal", year, month);
     const journalFilePath = join(journalDir, `${dateString}.md`);
 

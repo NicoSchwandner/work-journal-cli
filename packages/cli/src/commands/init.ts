@@ -1,6 +1,5 @@
 import { mkdirSync, copyFileSync, readdirSync, existsSync, statSync } from "fs";
 import { join } from "path";
-import type { CommandModule } from "yargs";
 import { packageTemplatesDir } from "../lib/pathHelpers";
 
 export function runInit(force: boolean, destDir: string, sourceDir: string): void {
@@ -21,29 +20,3 @@ export function runInit(force: boolean, destDir: string, sourceDir: string): voi
     }
   }
 }
-
-interface InitArgs {
-  force: boolean;
-}
-
-export const initCommand: CommandModule<{}, InitArgs> = {
-  command: "init",
-  describe: "seed templates in ./templates",
-  builder: (yargs) =>
-    yargs.option("force", {
-      type: "boolean",
-      default: false,
-      describe: "Overwrite existing templates directory",
-    }),
-  handler: ({ force }) => {
-    const dest = join(process.cwd(), "templates");
-    try {
-      const source = packageTemplatesDir();
-      runInit(force, dest, source);
-      console.log("✅ templates/ ready – hack away!");
-    } catch (error: any) {
-      console.error(`Error: ${error.message}`);
-      process.exit(1);
-    }
-  },
-};

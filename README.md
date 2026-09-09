@@ -139,16 +139,20 @@ work-journal/
 <summary>work-journal --help</summary>
 
 ```text
-work-journal <command>
+Usage: work-journal <command> [options]
 
 Commands:
-  work-journal init    seed templates in ./templates
-  work-journal new     create or append to today's journal entry
-  work-journal config  Manage configuration
+  init                      seed templates in ./templates
+  new                       create or append to today's journal entry
+  config get [key]          read configuration value(s)
+  config set <key> <value>  set configuration value
 
 Options:
-  --version  Show version number                                       [boolean]
-  --help     Show help                                                 [boolean]
+  -h, --help       show help
+  --force          init: overwrite existing templates directory
+                   new:  overwrite existing journal entry
+  --offset <days>  new:  day offset from today (default 0)
+  --open           new:  open the journal entry after creation
 ```
 
 </details>
