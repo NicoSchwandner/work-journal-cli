@@ -1,5 +1,11 @@
 # work-journal
 
+## 2.1.1
+
+### Patch Changes
+
+- 060a8e7: Fill $month and $monthName in the monthly template; monthly entries no longer render with literal placeholders.
+
 ## 2.1.0
 
 ### Minor Changes
