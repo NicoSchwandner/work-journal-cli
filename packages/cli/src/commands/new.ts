@@ -1,18 +1,10 @@
 import { existsSync, mkdirSync, writeFileSync, appendFileSync, readFileSync } from "fs";
 import { join } from "path";
-import type { CommandModule } from "yargs";
-import { addDays, format } from "date-fns";
 import { spawn } from "child_process";
 import { loadTemplate } from "../lib/templateLoader";
 import { render, hasUnreplaced } from "../lib/placeholder";
-import { isFriday, isEndOfMonthFriday, isEndOfQuarterFriday, isVacationFriday, weekNum } from "../lib/dateLogic";
+import { isFriday, isEndOfMonthFriday, isEndOfQuarterFriday, isVacationFriday, weekNum, isoDate, longDate } from "../lib/dateLogic";
 import { getConfig } from "../lib/config";
-
-interface NewCommandArgs {
-  offset: number;
-  open: boolean;
-  force: boolean;
-}
 
 /**
  * Determines the appropriate template to use based on date
@@ -46,11 +38,9 @@ function determineTemplate(targetDate: Date): string {
  */
 export function runNew(targetDate: Date, shouldOpen: boolean, force: boolean = false): string {
   // Format date components
-  const year = format(targetDate, "yyyy");
-  const month = format(targetDate, "MM");
-  const day = format(targetDate, "dd");
-  const dateString = format(targetDate, "yyyy-MM-dd");
-  const formattedDate = format(targetDate, "EEEE, MMMM do yyyy");
+  const dateString = isoDate(targetDate);
+  const [year, month] = dateString.split("-");
+  const formattedDate = longDate(targetDate);
   const weekNumber = weekNum(targetDate);
 
   // Calculate quarter (1-4)
@@ -121,36 +111,3 @@ export function runNew(targetDate: Date, shouldOpen: boolean, force: boolean = f
 
   return journalFilePath;
 }
-
-export const newCommand: CommandModule<{}, NewCommandArgs> = {
-  command: "new",
-  describe: "create or append to today's journal entry",
-  builder: (yargs) =>
-    yargs
-      .option("offset", {
-        type: "number",
-        default: 0,
-        describe: "Day offset from today",
-      })
-      .option("open", {
-        type: "boolean",
-        default: false,
-        describe: "Open the journal entry after creation",
-      })
-      .option("force", {
-        type: "boolean",
-        default: false,
-        describe: "Force overwrite existing journal entry",
-      }),
-  handler: ({ offset, open, force }) => {
-    try {
-      // Calculate target date by adding the offset to today
-      const targetDate = addDays(new Date(), offset);
-      const journalPath = runNew(targetDate, open, force);
-      console.log(`Journal entry ready: ${journalPath}`);
-    } catch (error: any) {
-      console.error(`Error: ${error.message}`);
-      process.exit(1);
-    }
-  },
-};

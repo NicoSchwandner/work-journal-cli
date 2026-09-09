@@ -1,70 +1,54 @@
-import { isFriday as _isFriday, getISOWeek, addDays, endOfQuarter, endOfMonth, startOfDay } from "date-fns";
+const DAY_MS = 86_400_000;
 
-/**
- * Checks if a given date is a Friday.
- * Re-exported from date-fns.
- * @param d The date to check.
- * @returns True if the date is a Friday, false otherwise.
- */
-export const isFriday = _isFriday;
+export const startOfDay = (d: Date): Date => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-/**
- * Gets the ISO week number of a given date.
- * Re-exported from date-fns.
- * @param d The date.
- * @returns The ISO week number.
- */
-export const weekNum = getISOWeek;
+export const addDays = (d: Date, n: number): Date => {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+};
 
-/**
- * Checks if a given date is the last Friday of its month.
- * @param d The date to check.
- * @returns True if the date is the last Friday of the month, false otherwise.
- */
+export const isFriday = (d: Date): boolean => d.getDay() === 5;
+
+/** ISO 8601 week number (weeks start Monday, week 1 contains Jan 4th). */
+export function weekNum(d: Date): number {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7)); // shift to Thursday of this week
+  const yearStart = Date.UTC(t.getUTCFullYear(), 0, 1);
+  return Math.ceil(((t.getTime() - yearStart) / DAY_MS + 1) / 7);
+}
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** "2025-03-28" */
+export const isoDate = (d: Date): string => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** "Friday, March 28th 2025" */
+export function longDate(d: Date): string {
+  const weekday = d.toLocaleDateString("en-US", { weekday: "long" });
+  const month = d.toLocaleDateString("en-US", { month: "long" });
+  return `${weekday}, ${month} ${ordinal(d.getDate())} ${d.getFullYear()}`;
+}
+
+function ordinal(n: number): string {
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return `${n}th`;
+  return n + (["th", "st", "nd", "rd"][n % 10] ?? "th");
+}
+
 export function isEndOfMonthFriday(d: Date): boolean {
-  // Normalize to the start of the day to avoid time zone issues
-  const currentDate = startOfDay(d);
-  const nextWeek = startOfDay(addDays(currentDate, 7));
-  // Check if it's a Friday and if adding 7 days moves it to the next month
-  return isFriday(currentDate) && currentDate.getMonth() !== nextWeek.getMonth();
+  return isFriday(d) && addDays(d, 7).getMonth() !== d.getMonth();
 }
 
-/**
- * Checks if a given date is the last Friday of its quarter.
- * @param d The date to check.
- * @returns True if the date is the last Friday of the quarter, false otherwise.
- */
 export function isEndOfQuarterFriday(d: Date): boolean {
-  // Normalize to the start of the day
-  const currentDate = startOfDay(d);
-  const endOfQuarterDate = endOfQuarter(currentDate);
-  const nextWeek = startOfDay(addDays(currentDate, 7));
-
-  // Check if it's a Friday AND if the end of the quarter falls *before* the next Friday.
-  // This means the current Friday is the last one in the quarter.
-  return isFriday(currentDate) && endOfQuarterDate < nextWeek;
+  const quarter = (x: Date) => x.getFullYear() * 4 + Math.floor(x.getMonth() / 3);
+  return isFriday(d) && quarter(addDays(d, 7)) !== quarter(d);
 }
 
-/**
- * Checks if a given date is the last Friday before a year-end cut-off date.
- * Useful for determining the last working Friday before a holiday break.
- * @param d The date to check.
- * @param cutOffDay The day of the month in December for the cut-off (e.g., 17 for December 17th).
- * @returns True if the date is the final Friday before the cut-off, false otherwise.
- */
+/** The last Friday on or before December `cutOffDay` — the final working Friday before the holiday break. */
 export function isVacationFriday(d: Date, cutOffDay: number): boolean {
-  if (!isFriday(d) || d.getMonth() !== 11) {
-    // Must be a Friday in December
-    return false;
-  }
-  // Normalize to the start of the day
-  const currentDate = startOfDay(d);
-  // Calculate the cut-off date for the current year
-  const endYearCutOff = startOfDay(new Date(currentDate.getFullYear(), 11, cutOffDay));
-
-  // Calculate the difference in days
-  const diff = (endYearCutOff.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
-
-  // Is it the Friday *before* the cut-off week? (diff is between 0 and 6 inclusive)
+  if (!isFriday(d) || d.getMonth() !== 11) return false;
+  const cutOff = new Date(d.getFullYear(), 11, cutOffDay);
+  const diff = (cutOff.getTime() - startOfDay(d).getTime()) / DAY_MS;
   return diff >= 0 && diff < 7;
 }

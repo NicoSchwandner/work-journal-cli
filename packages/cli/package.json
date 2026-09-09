@@ -28,16 +28,10 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
-  "dependencies": {
-    "date-fns": "^4.1.0",
-    "yargs": "^18.0.0"
-  },
   "devDependencies": {
     "@types/mock-fs": "^4.13.4",
     "@types/node": "^25.4.0",
-    "@types/yargs": "^17.0.35",
     "@vitest/coverage-v8": "^4.0.18",
-    "execa": "^9.6.1",
     "mock-fs": "^5.5.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
