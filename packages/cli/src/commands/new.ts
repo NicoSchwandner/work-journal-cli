@@ -61,6 +61,8 @@ export function runNew(targetDate: Date, shouldOpen: boolean, force: boolean = f
     date: formattedDate,
     week: weekNumber,
     year,
+    month,
+    monthName: targetDate.toLocaleDateString("en-US", { month: "long" }),
     quarter,
   };
 

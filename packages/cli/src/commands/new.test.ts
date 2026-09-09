@@ -126,6 +126,15 @@ describe("new command", () => {
     expect(writtenContent).not.toContain("<!-- TEMPLATE:");
   });
 
+  test("End-of-month Friday renders the monthly template with $month and $monthName filled in", () => {
+    vi.mocked(dateLogic.isEndOfMonthFriday).mockReturnValue(true);
+
+    runNew(new Date(2025, 4, 30), false); // May 30, 2025
+
+    expect(writtenContent).toContain("Monthly Review May 2025");
+    expect(writtenContent).not.toMatch(/\$[a-zA-Z]/);
+  });
+
   test("Friday creates file with weekly template", () => {
     // Set up Friday
     vi.mocked(dateLogic.isFriday).mockReturnValue(true);
