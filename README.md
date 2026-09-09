@@ -220,27 +220,23 @@ work-journal new # Uses 19 for the holiday cutoff calculation for this run
 <summary><code>work-journal --help</code> (click to expand)</summary>
 
 ```text
-work-journal <command>
+Usage: work-journal <command> [options]
 
 Commands:
-  work-journal init           Seed default templates into your project or user
-                              directory.
-                                --force: Overwrite existing templates directory
-                                --user: Copy to user config dir instead of project
-  work-journal new            Create or append to today's journal entry.
-                                --offset: Day offset from today (e.g., -1 for
-                                  yesterday, 1 for tomorrow)
-                                --open: Open the journal entry after creation
-                                --force: Force overwrite if journal entry already
-                                  exists
-  work-journal config         Manage configuration settings.
-                                get [key]: Read a specific or all config values
-                                set <key> <value>: Set a config value
-                                  --user: Save to user config instead of project
+  init                      seed templates into ./templates
+  new                       create or append to today's journal entry
+  config get [key]          read configuration value(s)
+  config set <key> <value>  set a configuration value
 
 Options:
-  --version  Show version number                                       [boolean]
-  --help     Show help                                                 [boolean]
+  --force          init: overwrite an existing templates directory
+                   new:  overwrite an existing journal entry
+  --user           init: copy templates into your user config dir instead of the project
+                   config set: save to user config instead of project config
+  --offset <days>  new:  day offset from today, e.g. -1 for yesterday (default 0)
+  --open           new:  open the journal entry after creation
+  -h, --help       show help
+  -v, --version    show version
 ```
 
 </details>

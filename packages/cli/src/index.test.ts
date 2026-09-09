@@ -1,26 +1,29 @@
 import { expect, test } from "vitest";
-import path from "path";
-import { fileURLToPath } from "url";
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-test("CLI boots", async () => {
-  const { execaNode } = await import("execa");
+const cli = path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), "dist", "index.js");
+const run = (...args: string[]) => {
+  const r = spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
+  return { code: r.status, out: r.stdout + r.stderr };
+};
 
-  // Get the path to the CLI binary, resolving from the current file location
-  // This ensures it works regardless of where the test is run from
-  const currentFilePath = import.meta.url ? fileURLToPath(import.meta.url) : __filename;
-  const cliPackageDir = path.dirname(path.dirname(currentFilePath));
-  const cliBinPath = path.join(cliPackageDir, "dist", "index.js");
+test("--help lists commands", () => {
+  const { code, out } = run("--help");
+  expect(code).toBe(0);
+  expect(out).toContain("Commands:");
+});
 
-  try {
-    const { stdout } = await execaNode(cliBinPath, ["--help"]);
-    expect(stdout).toContain("Commands:");
-  } catch (error) {
-    // Even if the command exits with an error code, we want to check its output
-    if (error.stdout || error.stderr) {
-      const output = [error.stdout, error.stderr].join("\n");
-      expect(output).toContain("Commands:");
-    } else {
-      throw error;
-    }
-  }
+test("--version prints the package version", () => {
+  expect(run("--version").out.trim()).toMatch(/^\d+\.\d+\.\d+/);
+});
+
+test("rejects unknown commands, stray arguments and options the command doesn't take", () => {
+  expect(run("bogus")).toMatchObject({ code: 1 });
+  expect(run("bogus").out).toContain("Unknown command: bogus");
+  expect(run("new", "foo").out).toContain("Unexpected argument: foo");
+  expect(run("config", "get", "--force").out).toContain("Unknown option for config: --force");
+  expect(run("new", "--frob").out).toContain("Unknown option '--frob'");
+  expect(run("new", "--offset", "abc").out).toContain("--offset must be an integer");
 });
